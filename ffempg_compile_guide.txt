@@ -1,0 +1,56 @@
+https://github.com/legotheboss/YouTube-files/wiki/(RPi)-Compile-FFmpeg-with-the-OpenMAX-H.264-GPU-acceleration
+
+sudo apt-get update
+sudo apt-get -y upgrade
+sudo rpi-update
+
+sudo apt-get install libomxil-bellagio-dev libasound2-dev git -y
+git clone https://github.com/FFmpeg/FFmpeg.git
+cd FFmpeg
+sudo ./configure --arch=armel --target-os=linux --enable-gpl --enable-omx --enable-omx-rpi --enable-nonfree \
+    --enable-gcrypt --enable-gmp --enable-librtmp --enable-version3 \
+    --enable-libfontconfig --enable-libfreetype --enable-libfribidi \
+    --enable-libmp3lame
+
+#extra features:
+    #rtmp
+    --enable-gcrypt --enable-gmp  --enable-librtmp
+    sudo apt-get install libgcrypt20 libgcrypt20-dev librtmp-dev librtmp1 libgmp-dev libgmp10
+
+    #https
+    --enable-gnutls 
+    sudo apt-get install libgnutls30 libgnutls28-dev
+
+    #subtitles
+    --enable-libass 
+    sudo apt-get install libass5 libass-dev
+
+    #voice synth
+    --enable-libflite 
+    sudo apt-get install libflite1 flite1-dev
+
+    #fonts
+    --enable-libfontconfig --enable-libfreetype --enable-libfribidi 
+    sudo apt-get install libfreetype6 libfreetype6-dev libfontconfig1 libfontconfig1-dev libfribidi0 libfribidi-dev
+
+    #mp3
+    --enable-libmp3lame
+    sudo apt-get install libmp3lame0 libmp3lame-dev
+
+    #opencv https://github.com/intel/caffe/wiki/Ubuntu-16.04-or-15.10-OpenCV-3.1-Installation-Guide
+    --enable-libopencv
+    sudo apt-get install libopencv-dev
+    
+sudo make -j4
+sudo make install
+
+#check encoders
+ffmpeg -encoders | grep h264_omx
+
+#To list the supported, connected capture devices:
+v4l2-ctl --list-devices
+ffmpeg -f v4l2 -list_formats all -i /dev/video0
+
+#to get options for codes
+ffmpeg -h encoder=h264_omx
+ffmpeg -h encoder=aac
